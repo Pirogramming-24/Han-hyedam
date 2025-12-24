@@ -8,7 +8,7 @@
 
 ## 과제 목록 📕
 ### Week 1
-- Git/Github 기초 학습 및 실습햣
+- Git/Github 기초 학습 및 실습
 - 운영체제 과제
 
 ### Week 2
