@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1><a href="{% url 'reviews:review_list' %}">my<span>Movie</span>reviews</a></h1>
+    <a href="{% url 'reviews:review_list' %}" class="add-link">리뷰 작성</a>
+</div>
+
+<div class="form-container">
+    <h2 class="form-title"><span class="movie-red">Movie</span> review 🍿</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>제목:</label>
+            <input type="text" name="title" value="{{ review.title|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>개봉년도:</label>
+            <input type="number" name="release_year" value="{{ review.release_year|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>장르:</label>
+            <select name="genre" required>
+                <option value="">선택하세요</option>
+                <option value="액션" {% if review.genre == '액션' %}selected{% endif %}>액션</option>
+                <option value="코미디" {% if review.genre == '코미디' %}selected{% endif %}>코미디</option>
+                <option value="드라마" {% if review.genre == '드라마' %}selected{% endif %}>드라마</option>
+                <option value="SF" {% if review.genre == 'SF' %}selected{% endif %}>SF</option>
+                <option value="스릴러" {% if review.genre == '스릴러' %}selected{% endif %}>스릴러</option>
+                <option value="로맨스" {% if review.genre == '로맨스' %}selected{% endif %}>로맨스</option>
+                <option value="애니메이션" {% if review.genre == '애니메이션' %}selected{% endif %}>애니메이션</option>
+                <option value="다큐멘터리" {% if review.genre == '다큐멘터리' %}selected{% endif %}>다큐멘터리</option>
+                <option value="호러" {% if review.genre == '호러' %}selected{% endif %}>호러</option>
+                <option value="판타지" {% if review.genre == '판타지' %}selected{% endif %}>판타지</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>별점:</label>
+            <input type="number" step="0.1" name="rating" value="{{ review.rating|default:'' }}" min="0" max="5" required>
+        </div>
+        
+        <div class="form-group">
+            <label>러닝타임(분):</label>
+            <input type="number" name="running_time" value="{{ review.running_time|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>리뷰:</label>
+            <textarea name="content" required>{{ review.content|default:'' }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>감독:</label>
+            <input type="text" name="director" value="{{ review.director|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>배우:</label>
+            <input type="text" name="actors" value="{{ review.actors|default:'' }}" placeholder="쉼표로 구분" required>
+        </div>
+        
+        <button type="submit" class="save-btn">Save</button>
+    </form>
+</div>
+
+{% endblock %}
