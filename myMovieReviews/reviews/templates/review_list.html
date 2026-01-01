@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1><a href="{% url 'reviews:review_list' %}">my<span>Movie</span>reviews</a></h1>
+    <a href="{% url 'reviews:create' %}" class="add-link">리뷰 작성</a>
+</div>
+
+<div class="sort-bar">
+    <strong>정렬:</strong>
+    <a href="?sort=-created_at">최신 작성순</a> |
+    <a href="?sort=title">제목 이름순 (ㄱ-ㅎ)</a> |
+    <a href="?sort=rating">별점 높은 순</a> |
+    <a href="?sort=running_time">상영시간 짧은 순</a> |
+    <a href="?sort=release_year">최신 개봉순</a>
+</div>
+
+<div class="grid">
+    {% for review in reviews %}
+    <div class="movie-card">
+        <div class="poster"></div>
+        <div class="movie-info">
+            <a href="{% url 'reviews:detail' review.id %}" class="movie-title">{{ review.title }}</a>
+            <p class="info-item">개봉년도: {{ review.release_year }}년</p>
+            <p class="info-item">장르: {{ review.genre }}</p>
+            <p class="info-item">별점: {{ review.rating }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

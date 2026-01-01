@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1><a href="{% url 'reviews:review_list' %}">my<span>Movie</span>reviews</a></h1>
+    <a href="{% url 'reviews:create' %}" class="add-link">리뷰 작성</a>
+</div>
+
+<div class="detail-container">
+    <div class="detail-header">
+        <h2 class="movie-title-detail">{{ review.title }}</h2>
+        <div class="action-buttons">
+            <a href="{% url 'reviews:update' review.id %}">수정</a>
+            <form action="{% url 'reviews:delete' review.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="delete-btn">삭제</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="content-wrapper">
+        <div class="poster-detail"></div>
+        
+        <div class="info-wrapper">
+            <p class="info-row"><strong>개봉년도</strong> {{ review.release_year }}년</p>
+            <p class="info-row"><strong>감독</strong> {{ review.director }}</p>
+            <p class="info-row"><strong>주연</strong> {{ review.actors }}</p>
+            <p class="info-row"><strong>장르</strong> {{ review.genre }}</p>
+            <p class="info-row"><strong>별점</strong> {{ review.rating }}</p>
+            <p class="info-row"><strong>러닝타임</strong> {{ hours }}시간 {{ minutes }}분</p>
+        </div>
+    </div>
+    
+    <div class="review-content">
+        {{ review.content }}
+    </div>
+</div>
+
+{% endblock %}

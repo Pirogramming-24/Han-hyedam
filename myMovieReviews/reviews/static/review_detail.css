@@ -1,0 +1,86 @@
+.detail-container {
+    background: white;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.movie-title-detail {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 28px;
+    font-weight: normal;
+    color: #333;
+}
+
+.action-buttons a {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 15px;
+}
+
+.action-buttons a:hover {
+    text-decoration: underline;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.poster-detail {
+    flex-shrink: 0;
+    width: 240px;
+    height: 360px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+}
+
+.info-wrapper {
+    flex: 1;
+}
+
+.info-row {
+    margin: 15px 0;
+    font-size: 15px;
+    color: #333;
+    font-weight: 400;
+}
+
+.info-row strong {
+    font-weight: 700;
+}
+
+.review-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+    margin-top: 30px;
+    text-align: justify;
+    font-weight: 400;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 15px;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
