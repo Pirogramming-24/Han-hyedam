@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Idea Detail Update{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Idea Detail Update</h1>
+    <p>아이디어를 수정하세요!</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="title">아이디어명:</label>
+            <input type="text" id="title" name="title" value="{{ idea.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>현재 이미지:</label>
+            <img src="{{ idea.image.url }}" alt="{{ idea.title }}" class="current-image">
+        </div>
+        
+        <div class="form-group">
+            <label for="image">새 이미지 (선택사항):</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <small>새 이미지를 업로드하지 않으면 기존 이미지가 유지됩니다</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">아이디어 설명:</label>
+            <textarea id="content" name="content" required>{{ idea.content }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="interest">아이디어 관심도:</label>
+            <input type="number" id="interest" name="interest" value="{{ idea.interest }}" min="0">
+        </div>
+        
+        <div class="form-group">
+            <label for="devtool">예상 개발툴:</label>
+            <select id="devtool" name="devtool" required>
+                {% for devtool in devtools %}
+                <option value="{{ devtool.id }}" {% if devtool.id == idea.devtool.id %}selected{% endif %}>
+                    {{ devtool.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">SUBMIT</button>
+            <a href="{% url 'idea_detail' idea.id %}" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

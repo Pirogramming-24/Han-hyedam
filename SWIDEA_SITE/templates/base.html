@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My SW Idea Manage{% endblock %}</title>
+    
+    <!-- 구글 폰트 추가 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{% url 'idea_list' %}" class="logo">My SW Idea Manage</a>
+        <div class="menu">
+            <a href="{% url 'idea_list' %}">아이디어 목록</a>
+            <a href="{% url 'idea_create' %}">아이디어 등록</a>
+            <a href="{% url 'devtool_list' %}">개발툴 목록</a>
+            <a href="{% url 'devtool_create' %}">개발툴 등록</a>
+        </div>
+    </nav>
+    
+    {% if messages %}
+        <div class="container">
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

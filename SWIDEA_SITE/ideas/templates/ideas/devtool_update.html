@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DevTool Detail Update{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>DevTool Detail Update</h1>
+    <p>개발 도구 정보를 수정하세요!</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" value="{{ devtool.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="kind">분류:</label>
+            <select id="kind" name="kind" required>
+                {% for value, display in kinds %}
+                <option value="{{ value }}" {% if value == devtool.kind %}selected{% endif %}>
+                    {{ display }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">개발툴 설명:</label>
+            <textarea id="content" name="content" required>{{ devtool.content }}</textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">SUBMIT</button>
+            <a href="{% url 'devtool_detail' devtool.id %}" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

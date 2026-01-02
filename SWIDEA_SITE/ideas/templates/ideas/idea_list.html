@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Idea List{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/idea_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Idea List</h1>
+    <p>당신의 아이디어를 보관하고 관리하세요!</p>
+</div>
+
+<div class="controls">
+    <div class="sort-dropdown">
+        <label for="sortSelect" style="display: none;">정렬 기준</label>
+        <select id="sortSelect" onchange="window.location.href='?sort=' + this.value + '&search={{ search }}'">
+            <option value="" disabled {% if not sort %}selected{% endif %}>정렬기준</option>
+            <option value="latest" {% if sort == 'latest' %}selected{% endif %}>최신순</option>
+            <option value="name" {% if sort == 'name' %}selected{% endif %}>이름순</option>
+            <option value="interest" {% if sort == 'interest' %}selected{% endif %}>관심도순</option>
+            <option value="star" {% if sort == 'star' %}selected{% endif %}>찜하기순</option>
+        </select>
+    </div>
+    
+    <form method="get" class="search-box">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <input type="text" name="search" placeholder="아이디어 검색..." value="{{ search }}">
+        <button type="submit">검색</button>
+    </form>
+</div>
+
+<div class="idea-grid">
+    {% for idea in page_obj %}
+    <div class="idea-card">
+        <img src="{{ idea.image.url }}" alt="{{ idea.title }}">
+        
+        <div class="star-icon {% if idea.id in starred_ideas %}starred{% else %}unstarred{% endif %}" 
+             data-idea-id="{{ idea.id }}">
+            ⭐
+        </div>
+        
+        <div class="idea-card-content">
+            <h3><a href="{% url 'idea_detail' idea.id %}">{{ idea.title }}</a></h3>
+            <div class="idea-info">
+                <p>개발 개발툴: <a href="{% url 'devtool_detail' idea.devtool.id %}">{{ idea.devtool.name }}</a></p>
+            </div>
+            
+            <div class="interest-control" data-idea-id="{{ idea.id }}">
+                <span>아이디어 관심도:</span>
+                <button class="interest-btn" data-action="decrease">-</button>
+                <span class="interest-value">{{ idea.interest }}</span>
+                <button class="interest-btn" data-action="increase">+</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>등록된 아이디어가 없습니다.</p>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1&sort={{ sort }}&search={{ search }}">처음</a>
+        <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&search={{ search }}">이전</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}&sort={{ sort }}&search={{ search }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&search={{ search }}">다음</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort }}&search={{ search }}">마지막</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/idea_list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ devtool.name }} - Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>DevTool Detail</h1>
+    <p>개발 도구의 상세 정보를 확인하세요!</p>
+</div>
+
+<div class="detail-container">
+    <div class="detail-header">
+        <h1>{{ devtool.name }}</h1>
+        <span class="kind-badge">{{ devtool.kind }}</span>
+    </div>
+    
+    <div class="detail-info">
+        <div class="info-row">
+            <div class="info-label">분류:</div>
+            <div class="info-value">{{ devtool.kind }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">개발툴 설명:</div>
+            <div class="info-value">{{ devtool.content }}</div>
+        </div>
+    </div>
+    
+    <div class="related-ideas">
+        <h2>이 개발툴을 사용하는 SW 아이디어</h2>
+        {% if ideas %}
+            {% for idea in ideas %}
+            <div class="idea-item">
+                <a href="{% url 'idea_detail' idea.id %}">{{ idea.title }}</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>이 개발툴을 사용하는 아이디어가 없습니다.</p>
+        {% endif %}
+    </div>
+    
+    <div class="action-buttons">
+        <form method="post" action="{% url 'devtool_delete' devtool.id %}" 
+              onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">삭제</button>
+        </form>
+        
+        <a href="{% url 'devtool_update' devtool.id %}" class="btn btn-warning">수정</a>
+        <a href="{% url 'devtool_list' %}" class="btn btn-secondary">목록</a>
+    </div>
+</div>
+{% endblock %}
