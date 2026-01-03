@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ idea.title }} - Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Idea Detail</h1>
+    <p>아이디어의 상세 정보를 확인하세요!</p>
+</div>
+
+<div class="detail-container">
+    <div class="detail-header">
+        <div>
+            <h1>{{ idea.title }}</h1>
+            <small>등록일: {{ idea.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        
+        {% if user.is_authenticated %}
+        <div class="star-badge {% if is_starred %}starred{% else %}unstarred{% endif %}" 
+             id="star-badge"
+             data-idea-id="{{ idea.id }}">
+            ⭐
+        </div>
+        {% endif %}
+    </div>
+    
+    <img src="{{ idea.image.url }}" alt="{{ idea.title }}" class="detail-image">
+    
+    <div class="detail-info">
+        <div class="info-row">
+            <div class="info-label">아이디어 관심도:</div>
+            <div class="info-value">{{ idea.interest }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">예상 개발툴:</div>
+            <div class="info-value">
+                <a href="{% url 'devtool_detail' idea.devtool.id %}">{{ idea.devtool.name }}</a>
+            </div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">아이디어 설명:</div>
+            <div class="info-value">{{ idea.content }}</div>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <form method="post" action="{% url 'idea_delete' idea.id %}" 
+              onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">삭제</button>
+        </form>
+        
+        <a href="{% url 'idea_update' idea.id %}" class="btn btn-warning">수정</a>
+        <a href="{% url 'idea_list' %}" class="btn btn-secondary">목록</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/idea_detail.js' %}"></script>
+{% endblock %}

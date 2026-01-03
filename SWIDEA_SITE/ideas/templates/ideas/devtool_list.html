@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DevTool List{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/devtool_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>DevTool List</h1>
+    <p>개발 도구 목록을 확인하세요!</p>
+</div>
+
+<div class="devtool-container">
+    {% if devtools %}
+    <table class="devtool-table">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>분류</th>
+                <th>설명</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for devtool in devtools %}
+            <tr>
+                <td data-label="이름">
+                    <a href="{% url 'devtool_detail' devtool.id %}">{{ devtool.name }}</a>
+                </td>
+                <td data-label="분류">
+                    <span class="kind-badge">{{ devtool.kind }}</span>
+                </td>
+                <td data-label="설명">{{ devtool.content|truncatewords:20 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-data">
+        등록된 개발툴이 없습니다.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

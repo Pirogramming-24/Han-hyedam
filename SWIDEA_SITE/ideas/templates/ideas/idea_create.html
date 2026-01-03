@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Idea Register{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Idea Register</h1>
+    <p>당신이 가진 아이디어를 등록해보세요!</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="title">아이디어명:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="image">image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <small>썸네일로 사용될 이미지를 선택하세요</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">아이디어 설명:</label>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="interest">아이디어 관심도:</label>
+            <input type="number" id="interest" name="interest" value="0" min="0">
+        </div>
+        
+        <div class="form-group">
+            <label for="devtool">예상 개발툴:</label>
+            <select id="devtool" name="devtool" required>
+                <option value="">개발툴을 선택하세요</option>
+                {% for devtool in devtools %}
+                <option value="{{ devtool.id }}">{{ devtool.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">SUBMIT</button>
+            <a href="{% url 'idea_list' %}" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
