@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<title>상품 등록 - 사과 마켓</title>
+<link rel="stylesheet" href="{% static 'posts/css/create.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="create-wrapper">
+    <a href="/" class="back-button">← 목록으로 돌아가기</a>
+    
+    <div class="create-card">
+        <div class="create-header">
+            <h2>🍎 상품 등록하기</h2>
+        </div>
+        
+        <div class="form-content">
+            <form action="{% url 'posts:create' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.title.label }}</label>
+                    {{ form.title }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.content.label }}</label>
+                    {{ form.content }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.region.label }}</label>
+                    {{ form.region }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.user.label }}</label>
+                    {{ form.user }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.price.label }}</label>
+                    {{ form.price }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.photo.label }}</label>
+                    {{ form.photo }}
+                </div>
+                
+                <div class="hashtag-section">
+                    <div class="hashtag-title">
+                        🏷️ 상품 해시태그
+                    </div>
+                    <p class="feature-description">
+                        상품 이미지를 업로드하면 AI가 자동으로 해시태그를 생성해요!
+                    </p>
+                    <div id="hashtagAnalyzing" class="analyzing-message" style="display: none;">
+                        🤖 이미지 분석 중...
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.hashtags.label }}</label>
+                        {{ form.hashtags }}
+                        <small class="filename-display">쉼표(,)로 구분해주세요.</small>
+                    </div>
+                </div>
+                
+                <div class="nutrition-section">
+                    <div class="nutrition-title">
+                        📊 영양성분 정보
+                    </div>
+                    <p class="feature-description">
+                        영양성분표 사진을 업로드하면 OCR로 자동 인식해요!
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">영양성분 이미지</label>
+                        <input type="file" 
+                               id="nutrition_image_input" 
+                               name="nutrition_image" 
+                               class="form-control" 
+                               accept="image/*">
+                        <small id="nutritionFilename" class="filename-display"></small>
+                    </div>
+                    
+                    <div id="analyzingMessage" class="analyzing-message" style="display: none;">
+                        🔍 영양성분 분석 중...
+                    </div>
+                    
+                    <div class="nutrition-grid">
+                        <div class="form-group">
+                            <label class="form-label">{{ form.calories.label }}</label>
+                            {{ form.calories }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.carbs.label }}</label>
+                            {{ form.carbs }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.protein.label }}</label>
+                            {{ form.protein }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.fat.label }}</label>
+                            {{ form.fat }}
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-button">✨ 등록하기</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// 상품 이미지 업로드 시 해시태그 자동 생성
+document.getElementById('id_photo').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const hashtagAnalyzing = document.getElementById('hashtagAnalyzing');
+    hashtagAnalyzing.style.display = 'block';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+        const response = await fetch('{% url "posts:generate_hashtags" %}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        hashtagAnalyzing.style.display = 'none';
+        
+        if (data.success && data.hashtags.length > 0) {
+            document.getElementById('id_hashtags').value = data.hashtags.join(', ');
+            alert('✅ 해시태그 자동 생성 완료!\n' + data.hashtags.join(', '));
+        } else {
+            alert('⚠️ 해시태그를 생성하지 못했습니다.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        hashtagAnalyzing.style.display = 'none';
+        alert('❌ 해시태그 생성 중 오류가 발생했습니다.');
+    }
+});
+
+// 영양성분 이미지 업로드 시 OCR 분석
+document.getElementById('nutrition_image_input').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('nutritionFilename').textContent = file.name;
+    
+    const analyzingMsg = document.getElementById('analyzingMessage');
+    analyzingMsg.style.display = 'block';
+    
+    document.getElementById('id_calories').placeholder = '분석 중...';
+    document.getElementById('id_carbs').placeholder = '분석 중...';
+    document.getElementById('id_protein').placeholder = '분석 중...';
+    document.getElementById('id_fat').placeholder = '분석 중...';
+    
+    const formData = new FormData();
+    formData.append('nutrition_image', file);
+    
+    try {
+        const response = await fetch('{% url "posts:analyze_nutrition" %}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        analyzingMsg.style.display = 'none';
+        
+        if (data.success) {
+            const nutrition = data.nutrition;
+            document.getElementById('id_calories').value = nutrition.calories || '';
+            document.getElementById('id_carbs').value = nutrition.carbs || '';
+            document.getElementById('id_protein').value = nutrition.protein || '';
+            document.getElementById('id_fat').value = nutrition.fat || '';
+            
+            document.getElementById('id_calories').placeholder = '';
+            document.getElementById('id_carbs').placeholder = '';
+            document.getElementById('id_protein').placeholder = '';
+            document.getElementById('id_fat').placeholder = '';
+            
+            alert('✅ 영양성분 분석 완료!');
+        } else {
+            alert('❌ 영양성분 분석에 실패했습니다: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ 영양성분 분석 중 오류가 발생했습니다.');
+        analyzingMsg.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<title>상품 수정 - 사과 마켓</title>
+<link rel="stylesheet" href="{% static 'posts/css/update.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="update-wrapper">
+    <a href="{% url 'posts:detail' post.pk %}" class="back-button">← 상세 페이지로 돌아가기</a>
+    
+    <div class="update-card">
+        <div class="update-header">
+            <h2>✏️ 상품 수정하기</h2>
+        </div>
+        
+        <div class="form-content">
+            <form action="{% url 'posts:update' post.pk %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.title.label }}</label>
+                    {{ form.title }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.content.label }}</label>
+                    {{ form.content }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.region.label }}</label>
+                    {{ form.region }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.user.label }}</label>
+                    {{ form.user }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.price.label }}</label>
+                    {{ form.price }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{{ form.photo.label }}</label>
+                    {% if post.photo %}
+                    <div class="current-preview">
+                        <p><strong>현재 이미지:</strong></p>
+                        <img src="{{ post.photo.url }}" alt="현재 이미지">
+                    </div>
+                    {% endif %}
+                    {{ form.photo }}
+                    <small class="help-text">새 이미지를 선택하면 기존 이미지가 교체됩니다.</small>
+                </div>
+                
+                <div class="hashtag-section">
+                    <div class="hashtag-title">
+                        🏷️ 상품 해시태그
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.hashtags.label }}</label>
+                        {{ form.hashtags }}
+                        <small class="filename-display">쉼표(,)로 구분해주세요.</small>
+                    </div>
+                </div>
+                
+                <div class="nutrition-section">
+                    <div class="nutrition-title">
+                        📊 영양성분 정보
+                    </div>
+                    <p class="feature-description">
+                        영양성분표 사진을 업로드하면 OCR로 자동 인식해요!
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">영양성분 이미지</label>
+                        {% if post.nutrition_image %}
+                        <div class="current-preview">
+                            <p><strong>현재 영양성분 이미지:</strong></p>
+                            <img src="{{ post.nutrition_image.url }}" alt="현재 영양성분 이미지" style="max-width: 200px;">
+                        </div>
+                        {% endif %}
+                        <input type="file" 
+                               id="nutrition_image_input" 
+                               name="nutrition_image" 
+                               class="form-control" 
+                               accept="image/*">
+                        <small id="nutritionFilename" class="filename-display"></small>
+                    </div>
+                    
+                    <div id="analyzingMessage" class="analyzing-message" style="display: none;">
+                        🔍 영양성분 분석 중...
+                    </div>
+                    
+                    <div class="nutrition-grid">
+                        <div class="form-group">
+                            <label class="form-label">{{ form.calories.label }}</label>
+                            {{ form.calories }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.carbs.label }}</label>
+                            {{ form.carbs }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.protein.label }}</label>
+                            {{ form.protein }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">{{ form.fat.label }}</label>
+                            {{ form.fat }}
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-button">✨ 수정 완료</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('nutrition_image_input').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('nutritionFilename').textContent = file.name;
+    
+    const analyzingMsg = document.getElementById('analyzingMessage');
+    analyzingMsg.style.display = 'block';
+    
+    document.getElementById('id_calories').placeholder = '분석 중...';
+    document.getElementById('id_carbs').placeholder = '분석 중...';
+    document.getElementById('id_protein').placeholder = '분석 중...';
+    document.getElementById('id_fat').placeholder = '분석 중...';
+    
+    const formData = new FormData();
+    formData.append('nutrition_image', file);
+    
+    try {
+        const response = await fetch('{% url "posts:analyze_nutrition" %}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        analyzingMsg.style.display = 'none';
+        
+        if (data.success) {
+            const nutrition = data.nutrition;
+            document.getElementById('id_calories').value = nutrition.calories || '';
+            document.getElementById('id_carbs').value = nutrition.carbs || '';
+            document.getElementById('id_protein').value = nutrition.protein || '';
+            document.getElementById('id_fat').value = nutrition.fat || '';
+            
+            document.getElementById('id_calories').placeholder = '';
+            document.getElementById('id_carbs').placeholder = '';
+            document.getElementById('id_protein').placeholder = '';
+            document.getElementById('id_fat').placeholder = '';
+            
+            alert('✅ 영양성분 분석 완료!');
+        } else {
+            alert('❌ 영양성분 분석에 실패했습니다: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ 영양성분 분석 중 오류가 발생했습니다.');
+        analyzingMsg.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
