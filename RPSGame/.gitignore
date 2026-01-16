@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# MediaPipe model (과제 필수)
+hand_landmarker.task
+
+# IDE
+.vscode/

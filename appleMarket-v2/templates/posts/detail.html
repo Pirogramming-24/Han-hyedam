@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+<link rel="stylesheet" href="{% static 'posts/css/detail.css' %}">
+<title>{{ post.title }} - 사과 마켓</title>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrapper">
+    <a href="/" class="back-button">← 목록으로 돌아가기</a>
+    
+    <div class="detail-card">
+        <div class="detail-header">
+            <h1>{{ post.title }}</h1>
+        </div>
+        
+        <div class="detail-image-section">
+            {% if post.photo %}
+            <img src="{{ post.photo.url }}" alt="{{ post.title }}">
+            {% else %}
+            <img src="{% static 'posts/image/no-image.jpg' %}" alt="기본 이미지">
+            {% endif %}
+        </div>
+        
+        <div class="detail-content">
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">작성자</div>
+                    <div class="info-value">{{ post.user }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">지역</div>
+                    <div class="info-value">{{ post.region }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">가격</div>
+                    <div class="info-value">{{ post.price|floatformat:0 }}원</div>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <h3>📝 상품 설명</h3>
+                <p>{{ post.content }}</p>
+            </div>
+            
+            {% if post.hashtags %}
+            <div class="hashtag-box">
+                <div class="hashtag-box-title">
+                    🏷️ 상품 태그
+                </div>
+                <div class="hashtag-list">
+                    {% for tag in post.get_hashtag_list %}
+                    <a href="/?hashtag={{ tag }}" class="hashtag-item">#{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if post.calories or post.carbs or post.protein or post.fat %}
+            <div class="nutrition-box">
+                <div class="nutrition-box-title">
+                    📊 식품 영양 정보
+                </div>
+                <div class="nutrition-grid">
+                    {% if post.calories %}
+                    <div class="nutrition-item">
+                        <strong>칼로리</strong>
+                        <span>{{ post.calories }}kcal</span>
+                    </div>
+                    {% endif %}
+                    {% if post.carbs %}
+                    <div class="nutrition-item">
+                        <strong>탄수화물</strong>
+                        <span>{{ post.carbs }}g</span>
+                    </div>
+                    {% endif %}
+                    {% if post.protein %}
+                    <div class="nutrition-item">
+                        <strong>단백질</strong>
+                        <span>{{ post.protein }}g</span>
+                    </div>
+                    {% endif %}
+                    {% if post.fat %}
+                    <div class="nutrition-item">
+                        <strong>지방</strong>
+                        <span>{{ post.fat }}g</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="meta-info">
+                <span>📅 작성일: {{ post.created_at|date:"Y년 m월 d일 H:i" }}</span>
+                {% if post.updated_at %}
+                <span>✏️ 수정일: {{ post.updated_at|date:"Y년 m월 d일 H:i" }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{% url 'posts:update' post.pk %}" class="btn btn-edit">수정하기</a>
+                <a href="{% url 'posts:delete' post.pk %}" class="btn btn-delete">삭제하기</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
