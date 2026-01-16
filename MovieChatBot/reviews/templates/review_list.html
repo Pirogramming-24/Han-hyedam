@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1><a href="{% url 'reviews:review_list' %}">my<span>Movie</span>reviews</a></h1>
+    <div>
+        {% if user.is_authenticated %}
+            <span style="color: #00ff41; margin-right: 10px;">{{ user.username }}님</span>
+            <a href="{% url 'reviews:logout' %}" class="logout-link">로그아웃</a>
+            <a href="{% url 'reviews:chatbot_page' %}" class="chatbot-link">🤖 챗봇</a>
+            <a href="{% url 'reviews:create' %}" class="add-link">리뷰 작성</a>
+        {% else %}
+            <a href="{% url 'reviews:login' %}" class="login-link">로그인</a>
+            <a href="{% url 'reviews:signup' %}" class="signup-link">회원가입</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="stats-section">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_count }}</div>
+        <div class="stat-label">총 영화</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ tmdb_count }}</div>
+        <div class="stat-label">TMDB 영화</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ user_count }}</div>
+        <div class="stat-label">USER</div>
+    </div>
+</div>
+
+<div class="search-bar">
+    <form action="{% url 'reviews:search' %}" method="get">
+        <input type="text" name="q" placeholder="영화 제목, 감독, 배우 검색..." required>
+        <button type="submit">검색</button>
+    </form>
+</div>
+
+<div class="filter-section">
+    <strong>필터:</strong>
+    <a href="?filter=all&sort={{ request.GET.sort }}" class="filter-btn {% if filter_type == 'all' %}active{% endif %}">전체</a>
+    <a href="?filter=tmdb&sort={{ request.GET.sort }}" class="filter-btn {% if filter_type == 'tmdb' %}active{% endif %}">TMDB</a>
+    <a href="?filter=user&sort={{ request.GET.sort }}" class="filter-btn {% if filter_type == 'user' %}active{% endif %}">USER</a>
+</div>
+
+<div class="sort-bar">
+    <div class="sort-bar-content">
+        <strong>정렬:</strong>
+        <a href="?filter={{ filter_type }}&sort=-created_at">최신 작성순</a> |
+        <a href="?filter={{ filter_type }}&sort=title">제목 이름순</a> |
+        <a href="?filter={{ filter_type }}&sort=rating">별점 높은 순</a> |
+        <a href="?filter={{ filter_type }}&sort=running_time">상영시간 짧은 순</a> |
+        <a href="?filter={{ filter_type }}&sort=release_year">최신 개봉순</a>
+    </div>
+</div>
+
+<div class="grid">
+    {% for review in reviews %}
+    <div class="movie-card">
+        {% if review.is_tmdb %}
+            <span class="tmdb-badge">TMDB</span>
+        {% endif %}
+        
+        <div class="poster">
+            {% if review.poster %}
+                <img src="{{ review.poster.url }}" alt="{{ review.title }} 포스터">
+            {% elif review.poster_path %}
+                <img src="https://image.tmdb.org/t/p/w500{{ review.poster_path }}" 
+                    alt="{{ review.title }} 포스터">
+            {% else %}
+                <div class="no-poster">포스터 없음</div>
+            {% endif %}
+        </div>
+        <div class="movie-info">
+            <a href="{% url 'reviews:detail' review.id %}" class="movie-title">{{ review.title }}</a>
+            <p class="info-item">개봉년도: {{ review.release_year }}년</p>
+            <p class="info-item">장르: {{ review.genre }}</p>
+            <p class="info-item">별점: {{ review.rating }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1&filter={{ filter_type }}&sort={{ request.GET.sort }}">처음</a>
+        <a href="?page={{ page_obj.previous_page_number }}&filter={{ filter_type }}&sort={{ request.GET.sort }}">이전</a>
+    {% else %}
+        <span class="disabled">처음</span>
+        <span class="disabled">이전</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}&filter={{ filter_type }}&sort={{ request.GET.sort }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&filter={{ filter_type }}&sort={{ request.GET.sort }}">다음</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&filter={{ filter_type }}&sort={{ request.GET.sort }}">끝</a>
+    {% else %}
+        <span class="disabled">다음</span>
+        <span class="disabled">끝</span>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

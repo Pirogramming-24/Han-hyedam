@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">새 리뷰 <span class="movie-red">작성</span></h2>
+    <p style="text-align: center; color: #ccc; margin-bottom: 20px;">영화에 대한 솔직한 감상을 남겨보세요</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="title">영화 제목</label>
+                <input type="text" id="title" name="title" value="{{ review.title }}" placeholder="영화 제목을 입력하세요" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="release_year">개봉 년도</label>
+                <input type="text" id="release_year" name="release_year" value="{{ review.release_year }}" placeholder="개봉 년도 (예: 2024)" required>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="genre">감독</label>
+                <input type="text" id="director" name="director" value="{{ review.director }}" placeholder="감독 이름을 입력하세요" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="genre">장르</label>
+                <select id="genre" name="genre" required>
+                    <option value="">----------</option>
+                    <option value="액션" {% if review.genre == '액션' %}selected{% endif %}>액션</option>
+                    <option value="코미디" {% if review.genre == '코미디' %}selected{% endif %}>코미디</option>
+                    <option value="드라마" {% if review.genre == '드라마' %}selected{% endif %}>드라마</option>
+                    <option value="SF" {% if review.genre == 'SF' %}selected{% endif %}>SF</option>
+                    <option value="스릴러" {% if review.genre == '스릴러' %}selected{% endif %}>스릴러</option>
+                    <option value="로맨스" {% if review.genre == '로맨스' %}selected{% endif %}>로맨스</option>
+                    <option value="애니메이션" {% if review.genre == '애니메이션' %}selected{% endif %}>애니메이션</option>
+                    <option value="다큐멘터리" {% if review.genre == '다큐멘터리' %}selected{% endif %}>다큐멘터리</option>
+                    <option value="호러" {% if review.genre == '호러' %}selected{% endif %}>호러</option>
+                    <option value="판타지" {% if review.genre == '판타지' %}selected{% endif %}>판타지</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="actors">주연배우</label>
+            <input type="text" id="actors" name="actors" value="{{ review.actors }}" placeholder="주연배우를 입력하세요 (여러 명일 경우 ', '로 구분)" required>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="running_time">러닝타임(분)</label>
+                <input type="text" id="running_time" name="running_time" value="{{ review.running_time }}" placeholder="러닝타임 (분 단위)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="rating">별점</label>
+                <input type="number" id="rating" name="rating" value="{{ review.rating }}" 
+                    min="0" max="5" step="0.1" placeholder="0~5점" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">리뷰 내용</label>
+            <textarea id="content" name="content" placeholder="영화에 대한 리뷰를 작성해주세요" required>{{ review.content }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="poster">포스터 이미지</label>
+            <input type="file" id="poster" name="poster" accept="image/*">
+            <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">이미지 파일(jpg, png 등)을 업로드하세요.</small>
+            {% if review.poster %}
+                <small style="color: #00ff41; font-size: 12px;">현재 파일: {{ review.poster.name }}</small>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <a href="{% url 'reviews:review_list' %}" style="flex: 1; padding: 14px; background: #333; color: white; text-align: center; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 15px;">취소</a>
+            <button type="submit" style="flex: 1; padding: 14px; background: #00ff41; color: #000; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer;">리뷰 작성</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

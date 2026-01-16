@@ -1,0 +1,47 @@
+# 환경 변수
+.env
+
+# 가상환경
+venv/
+env/
+ENV/
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 데이터베이스
+db.sqlite3
+*.db
+
+# RAG 벡터 스토어
+vector_store/
+
+# 미디어 파일 (업로드된 이미지들)
+media/
+
+# 정적 파일 수집 결과
+staticfiles/
+static_root/
+
+# IDE 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 로그 파일
+*.log
+
+# Python 패키지
+*.egg-info/
+dist/
+build/
