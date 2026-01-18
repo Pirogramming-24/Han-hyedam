@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="{% static 'auth.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <h2>🎬 로그인</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">로그인</button>
+        </form>
+        <div class="links">
+            <a href="{% url 'reviews:signup' %}">회원가입</a> |
+            <a href="{% url 'reviews:review_list' %}">홈으로</a>
+        </div>
+    </div>
+</body>
+</html>

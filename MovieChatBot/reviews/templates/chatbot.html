@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 영화 추천 챗봇</title>
+    <link rel="stylesheet" href="{% static 'chatbot.css' %}">
+</head>
+<body>
+    <div class="header">
+        <h1><a href="{% url 'reviews:review_list' %}">← 목록</a></h1>
+        <h1>🎬 AI 영화 추천 챗봇</h1>
+        <div></div>
+    </div>
+
+    <div class="chat-container">
+        <div id="chat">
+            <div class="welcome-box">
+                <div class="welcome-header">🎬 AI 영화 추천 챗봇</div>
+                <div class="welcome-content">
+                    <h2>안녕하세요! 🎥 AI 영화 추천 챗봇입니다.</h2>
+                    <p>다양한 영화 정보를 바탕으로 영화를 추천해드립니다.<br>어떤 영화를 찾고 계신가요?</p>
+                    
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="sendQuickQuestion('액션 영화 추천')">💥 액션 영화 추천</button>
+                        <button class="quick-btn" onclick="sendQuickQuestion('로맨스 영화')">💕 로맨스 영화</button>
+                        <button class="quick-btn" onclick="sendQuickQuestion('그래픽 영화')">🎨 그래픽 영화</button>
+                        <button class="quick-btn" onclick="sendQuickQuestion('최근 영화')">🆕 최근 영화</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <textarea id="question" placeholder="영화에 대해 무엇이든 물어보세요..."></textarea>
+                <button id="sendBtn">전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatDiv = document.getElementById('chat');
+        const questionInput = document.getElementById('question');
+        const sendBtn = document.getElementById('sendBtn');
+        let welcomeShown = true;
+
+        function sendQuickQuestion(text) {
+            questionInput.value = text;
+            sendMessage();
+        }
+
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        async function sendMessage() {
+            const q = questionInput.value.trim();
+            if (!q) return;
+
+            if (welcomeShown) {
+                const welcomeBox = document.querySelector('.welcome-box');
+                if (welcomeBox) welcomeBox.remove();
+                welcomeShown = false;
+            }
+
+            addMessage('user', q);
+            questionInput.value = '';
+            sendBtn.disabled = true;
+            sendBtn.textContent = '전송 중...';
+
+            try {
+                const response = await fetch("{% url 'reviews:chatbot' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: q })
+                });
+
+                const data = await response.json();
+                addMessage('bot', data.answer, data.movies);
+            } catch (error) {
+                addMessage('bot', '⚠️ 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '전송';
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }
+        }
+
+        function addMessage(role, text, movies = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+
+            if (movies && movies.length > 0) {
+                const movieList = document.createElement('div');
+                movieList.className = 'movie-list';
+                movieList.innerHTML = '<strong>🎬 추천 영화:</strong>';
+                movies.forEach(m => {
+                    movieList.innerHTML += `<a href="/reviews/${m.id}/">▸ ${m.title}</a>`;
+                });
+                bubble.appendChild(movieList);
+            }
+
+            messageDiv.appendChild(bubble);
+            chatDiv.appendChild(messageDiv);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'review_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1><a href="{% url 'reviews:review_list' %}">my<span>Movie</span>reviews</a></h1>
+    <div>
+        <a href="{% url 'reviews:chatbot_page' %}" class="chatbot-link">🤖 챗봇</a>
+        <a href="{% url 'reviews:create' %}" class="add-link">리뷰 작성</a>
+    </div>
+</div>
+
+<div class="search-bar">
+    <form action="{% url 'reviews:search' %}" method="get">
+        <input type="text" name="q" value="{{ query }}" placeholder="영화 제목, 감독, 배우 검색..." required>
+        <button type="submit">검색</button>
+    </form>
+</div>
+
+<div class="search-header">
+    {% if query %}
+        <h2>"{{ query }}" 검색 결과: {{ total }}개</h2>
+        <a href="{% url 'reviews:review_list' %}" class="back-link">← 전체 목록</a>
+    {% endif %}
+</div>
+
+{% if reviews %}
+<div class="grid">
+    {% for review in reviews %}
+    <div class="movie-card">
+        <div class="poster">
+            {% if review.poster_path %}
+                <img src="https://image.tmdb.org/t/p/w500{{ review.poster_path }}" 
+                     alt="{{ review.title }} 포스터">
+            {% else %}
+                <div class="no-poster">포스터 없음</div>
+            {% endif %}
+        </div>
+        <div class="movie-info">
+            <a href="{% url 'reviews:detail' review.id %}" class="movie-title">{{ review.title }}</a>
+            <p class="info-item">개봉년도: {{ review.release_year }}년</p>
+            <p class="info-item">감독: {{ review.director }}</p>
+            <p class="info-item">장르: {{ review.genre }}</p>
+            <p class="info-item">별점: {{ review.rating }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-results">
+    <p>검색 결과가 없습니다.</p>
+    <a href="{% url 'reviews:review_list' %}">전체 목록 보기</a>
+</div>
+{% endif %}
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&page=1">처음</a>
+        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">이전</a>
+    {% else %}
+        <span class="disabled">처음</span>
+        <span class="disabled">이전</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">다음</a>
+        <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">끝</a>
+    {% else %}
+        <span class="disabled">다음</span>
+        <span class="disabled">끝</span>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
